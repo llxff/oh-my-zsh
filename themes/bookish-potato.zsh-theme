@@ -47,6 +47,22 @@ battery_prompt_info() {
   echo "$COLOR$BATTERY_STATUS$STATUS%{$reset_color%}"
 }
 
+vpn_prompt_info() {
+  if [[ ! $(ifconfig | grep ipsec0) = "" ]]; then
+    VPN="$FG[095]✺ "
+  else
+    VPN=""
+  fi
+
+  if [[ ! $(ifconfig | grep utun1) = "" ]]; then
+    IVPN="$FG[094]❊ "
+  else
+    IVPN=""
+  fi
+
+  echo "$VPN$IVPN"
+}
+
 if [ $UID -eq 0 ]; then NCOLOR="red"; else NCOLOR="green"; fi
 local return_code="%(?..%{$fg[red]%}%? ↵%{$reset_color%})"
 
@@ -54,6 +70,7 @@ PROMPT='$FG[235]------------------------------------------------------------%{$r
 $FG[026]$(basename `pwd`)\
 $(git_prompt_info) \
 $(battery_prompt_info)\
+$(vpn_prompt_info)\
 $FG[105]%(!.#.»)%{$reset_color%} '
 PROMPT2='%{$fg[red]%}\ %{$reset_color%}'
 RPS1='${return_code}'
