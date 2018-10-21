@@ -24,10 +24,12 @@ battery_prompt_info() {
     good_color=$FG[010]
     middle_color=$FG[010]
     warn_color=$FG[010]
+    STATUS="％⌁"
   else
     good_color=$FG[136]
     middle_color=$FG[136]
     warn_color=$FG[196]
+    STATUS="％"
   fi
 
   if [[ $BATTERY_STATUS -ge 75 ]]; then
@@ -42,14 +44,14 @@ battery_prompt_info() {
     COLOR=$warn_color
   fi
 
-  echo "$COLOR$BATTERY_STATUS％%{$reset_color%}"
+  echo "$COLOR$BATTERY_STATUS$STATUS%{$reset_color%}"
 }
 
 if [ $UID -eq 0 ]; then NCOLOR="red"; else NCOLOR="green"; fi
 local return_code="%(?..%{$fg[red]%}%? ↵%{$reset_color%})"
 
 PROMPT='$FG[235]------------------------------------------------------------%{$reset_color%}
-$FG[020]$(basename `pwd`)\
+$FG[026]$(basename `pwd`)\
 $(git_prompt_info) \
 $(battery_prompt_info)\
 $FG[105]%(!.#.»)%{$reset_color%} '
