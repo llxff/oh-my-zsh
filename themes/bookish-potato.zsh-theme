@@ -14,16 +14,8 @@ header() {
   echo $LINE
 }
 
-ical_info() {
-  EVENT="$(icalBuddy -n -ab '' -b '' -ea -li 1 -iep "title,datetime" -nc title -eed eventsToday)"
-  EVENT_NAME=$(echo $EVENT | head -n1)
-  EVENT_TIME=$(echo $EVENT | tail -n1 | sed 's/ //g')
-
-  if [ -z "$EVENT" ]; then
-    echo "🆓"
-  else
-    echo "$EVENT_TIME: $EVENT_NAME"
-  fi
+weather() {
+  cat /tmp/weather
 }
 
 battery_info() {
@@ -34,7 +26,7 @@ battery_info() {
 }
 
 battery_external_connected() {
-  battery_info | grep "ExternalConnected" | cut -f2 -d' '
+  battery_info | grep "AppleRawExternalConnected" | cut -f2 -d' '
 }
 
 battery_prompt_info() {
@@ -64,26 +56,22 @@ battery_prompt_info() {
     COLOR=$warn_color
   fi
 
-  echo "$COLOR$BATTERY_STATUS$STATUS%{$reset_color%}"
+  echo "%{$COLOR%}$BATTERY_STATUS$STATUS%{$reset_color%}"
 }
 
-if [ $UID -eq 0 ]; then NCOLOR="red"; else NCOLOR="green"; fi
-local return_code="%(?..%{$fg[red]%}%? ↵%{$reset_color%})"
+local return_code="%(?..%{$fg[red]%} %?%{$reset_color%})"
 
 precmd() {
 prompt_color=$(printf "%03d" $(shuf -i 1-255 -n 1))
-PROMPT='$FG[$prompt_color]$(header)%{$reset_color%}
-$FG[026]$(basename "`pwd`")\
-$(git_prompt_info) \
-$(battery_prompt_info)\
-$FG[105]%(!.#.»)%{$reset_color%} '
+PROMPT='%{$FG[$prompt_color]%}$(header)%{$reset_color%}
+%{$FG[026]%}$(basename "`pwd`")$(git_prompt_info) $(battery_prompt_info)%{$FG[105]%}$return_code%(!.#.»  )%{$reset_color%}'
 }
 
-PROMPT2='%{$fg[red]%}\ %{$reset_color%}'
-RPS1='${return_code}'
-RPROMPT='$FG[092]$(ical_info) 🚀%{$reset_color%}%'
+PROMPT2='%{$fg[red]%}\%{$reset_color%}'
+RPS1=''
+RPROMPT='%{$FG[092]%}%{$reset_color%}'
 
-ZSH_THEME_GIT_PROMPT_PREFIX="$FG[206]:$FG[206]"
+ZSH_THEME_GIT_PROMPT_PREFIX="%{$FG[206]%}:%{$FG[206]%}"
 ZSH_THEME_GIT_PROMPT_CLEAN=""
-ZSH_THEME_GIT_PROMPT_DIRTY="$FG[214]*%{$reset_color%}"
+ZSH_THEME_GIT_PROMPT_DIRTY="%{$FG[214]%}*%{$reset_color%}"
 ZSH_THEME_GIT_PROMPT_SUFFIX="%{$reset_color%}"
